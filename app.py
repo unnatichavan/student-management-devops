@@ -1,7 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for
 from datetime import datetime
+from prometheus_flask_exporter import PrometheusMetrics
 
 app = Flask(__name__)
+metrics = PrometheusMetrics(app)  # This exposes /metrics
 
 # In-memory database
 students = []
