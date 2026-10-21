@@ -3,59 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Management System</title>
-    <!-- Bootstrap CSS for professional styling -->
+    <title>Student Management Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <style>
-        body { background-color: #f8f9fa; }
-        .container { max-width: 600px; margin-top: 50px; }
-        .card { box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        .delete-btn { text-decoration: none; }
+        body { background-color: #f4f6f9; font-family: 'Segoe UI', sans-serif; }
+        .dashboard-header { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; padding: 30px; border-radius: 15px; margin-top: 30px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .stat-card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid #2a5298; }
+        .stat-card h2 { font-size: 2.5rem; color: #2a5298; margin: 0; }
+        .stat-card p { margin: 0; color: #6c757d; font-weight: 600; text-transform: uppercase; font-size: 0.85rem; }
+        .main-card { background: white; border-radius: 10px; padding: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="card">
-        <div class="card-header bg-primary text-white text-center">
-            <h3 class="mb-0">🎓 Student Management System</h3>
+<div class="container pb-5">
+    <!-- Header -->
+    <div class="dashboard-header d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="fw-bold mb-0"><i class="bi bi-mortarboard-fill"></i> Student Management</h1>
+            <p class="mb-0 opacity-75">DevOps Mini-Project Dashboard</p>
         </div>
-        <div class="card-body">
-            
-            <!-- Add Student Form -->
-            <form action="/add" method="POST" class="mb-4">
-                <div class="input-group">
-                    <input type="text" name="name" class="form-control" placeholder="Enter student name" required>
-                    <button type="submit" class="btn btn-success">Add Student</button>
-                </div>
-            </form>
-
-            <!-- Student List -->
-            <h5 class="mb-3">Registered Students</h5>
-            
-            {% if students %}
-                <ul class="list-group">
-                    {% for student in students %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span>{{ student }}</span>
-                        <a href="/delete/{{ loop.index0 }}" class="btn btn-sm btn-danger delete-btn">Delete</a>
-                    </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <div class="alert alert-info text-center" role="alert">
-                    No students added yet. Add your first student above!
-                </div>
-            {% endif %}
-
+        <div class="text-end">
+            <span class="badge bg-success fs-6 p-2"><i class="bi bi-check-circle-fill"></i> System Online</span>
+            <p class="mb-0 mt-2 small opacity-75">Last Updated: {{ current_time }}</p>
         </div>
-        <div class="card-footer text-muted text-center">
-            DevOps Mini-Project | Powered by Jenkins & Docker
+    </div>
+
+    <!-- Dashboard Metrics -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="stat-card">
+                <p>Total Students</p>
+                <h2>{{ total_students }}</h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card" style="border-left-color: #28a745;">
+                <p>Pipeline Status</p>
+                <h2 style="color: #28a745; font-size: 1.8rem; margin-top: 10px;">PASSED</h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card" style="border-left-color: #ffc107;">
+                <p>Containerized</p>
+                <h2 style="color: #ffc107; font-size: 1.8rem; margin-top: 10px;">DOCKER</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Add Student & Search -->
+        <div class="col-md-4">
+            <div class="main-card mb-4">
+                <h5 class="mb-3"><i class="bi bi-person-plus-fill text-primary"></i> Add Student</h5>
+                <form action="/add" method="POST">
+                    <div class="input-group mb-3">
+                        <input type="text" name="name" class="form-control" placeholder="Enter name" required>
+                        <button class="btn btn-primary" type="submit">Add</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="main-card">
+                <h5 class="mb-3"><i class="bi bi-search text-primary"></i> Search Student</h5>
+                <form action="/" method="GET">
+                    <div class="input-group">
+                        <input type="text" name="search" class="form-control" placeholder="Search..." value="{{ search_query }}">
+                        <button class="btn btn-outline-secondary" type="submit">Search</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Student List -->
+        <div class="col-md-8">
+            <div class="main-card">
+                <h5 class="mb-3"><i class="bi bi-people-fill text-primary"></i> Registered Students</h5>
+                {% if students %}
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in students %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td class="fw-bold">{{ student }}</td>
+                                <td class="text-end">
+                                    <a href="/delete/{{ loop.index0 }}" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                        <p class="text-muted mt-2">No students found. Add a student to get started!</p>
+                    </div>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Bootstrap JS (Optional, for animations) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
